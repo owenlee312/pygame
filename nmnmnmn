@@ -1,0 +1,80 @@
+import pygame
+import random
+from urllib import urlretrieve
+
+BLACK = (0,0,0)
+RED = (255, 0, 0) #These tuples are RGB by the way
+WHITE = (255, 255, 255)
+
+pygame.init()
+WIDTH = 450
+HEIGHT = 600
+screen = pygame.display.set_mode([WIDTH, HEIGHT])
+
+another_loop = True
+clock = pygame.time.Clock()
+
+punchsound = pygame.mixer.Sound('punch.wav')
+swordsound = pygame.mixer.Sound('sword.wav')
+
+rsprite = pygame.image.load("idle_0.png") #load an image (blit it onto screen later)
+lsprite = pygame.transform.flip(rsprite, True, False) #this is a right facing copy
+rpunch_sprite = pygame.image.load("attack_2.png")
+lpunch_sprite = pygame.transform.flip(rpunch_sprite, True, False)
+rsword_sprite = pygame.image.load("attack_1.png")
+lsword_sprite = pygame.transform.flip(rsword_sprite, True, False)
+
+sprite = rsprite #this variable will store the current directioned version
+
+wx = 100
+wy = 100
+scale = 3.0 #I'm going to also allow scaling up and down
+wiz_w, wiz_h = lsprite.get_size()
+
+while another_loop:
+    # --- Basic Event Processing
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            another_loop = False
+            
+    screen.fill(BLACK)
+
+    if( pygame.key.get_pressed()[pygame.K_LEFT] != 0 ):
+        wx = (wx - 2) % WIDTH
+        sprite = lsprite
+    if( pygame.key.get_pressed()[pygame.K_RIGHT] != 0 ):
+        wx = (wx + 2) % WIDTH
+        sprite = rsprite
+
+    if( pygame.key.get_pressed()[pygame.K_UP] != 0 ):
+        wy = (wy - 2) % HEIGHT
+    if( pygame.key.get_pressed()[pygame.K_DOWN] != 0 ):
+        wy = (wy + 2) % HEIGHT
+
+    if( pygame.key.get_pressed()[pygame.K_1] != 0 ):
+        if sprite == rsprite:
+            sprite = rpunch_sprite
+            punchsound.play()
+        elif sprite == lsprite:
+            sprite = lpunch_sprite
+            punchsound.play()
+
+    if( pygame.key.get_pressed()[pygame.K_2] != 0 ):
+        if sprite == rsprite:
+            sprite = rsword_sprite
+            swordsound.play()
+        if sprite == lsprite:
+            sprite = lsword_sprite
+            swordsound.play()
+
+    #Then at blit time I'll make a scaled copy of the left or right facing normal sprite
+    screen.blit(pygame.transform.scale(sprite, (int(wiz_w*scale), int(wiz_h*scale))), (wx, wy))
+
+    clock.tick(60)
+ 
+    #This puts the new stuff you've drawn on screen
+    pygame.display.flip()
+
+#When we've left the while loop exit pygame 
+pygame.quit()
+   
